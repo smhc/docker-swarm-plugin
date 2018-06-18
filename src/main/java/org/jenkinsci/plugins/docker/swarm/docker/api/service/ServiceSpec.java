@@ -9,6 +9,7 @@ import org.jenkinsci.plugins.docker.swarm.docker.api.request.ApiRequest;
 import org.jenkinsci.plugins.docker.swarm.docker.api.task.TaskTemplate;
 import org.jenkinsci.plugins.docker.swarm.docker.marshalling.ResponseType;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,13 +21,13 @@ public class ServiceSpec extends ApiRequest {
     public Map<String,String> Labels = new HashMap<>();
 
     public List<Network> Networks = new ArrayList<>();
-    public ServiceSpec(String name, String Image, String[] Cmd, String[] Env) {
+    public ServiceSpec(String name, String Image, String[] Cmd, String[] Env) throws IOException {
         super(HttpMethod.POST, "/services/create",CreateServiceResponse.class, ResponseType.CLASS);
         this.Name = name;
         this.TaskTemplate = new TaskTemplate(Image,Cmd,Env);
     }
 
-    public ServiceSpec(){
+    public ServiceSpec() throws IOException {
         super(HttpMethod.POST, "", "/services/create",CreateServiceResponse.class, ResponseType.CLASS);
     }
 

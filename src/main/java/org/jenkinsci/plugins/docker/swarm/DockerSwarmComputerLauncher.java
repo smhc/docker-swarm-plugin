@@ -13,6 +13,8 @@ import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.docker.swarm.docker.api.service.ServiceSpec;
 
 import java.io.IOException;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 public class DockerSwarmComputerLauncher extends JNLPLauncher {
 
@@ -20,6 +22,7 @@ public class DockerSwarmComputerLauncher extends JNLPLauncher {
     private final String jobName;
     private final Queue.BuildableItem bi;
 
+    private static final Logger LOGGER = Logger.getLogger(DockerSwarmComputerLauncher.class.getName());
 
     public DockerSwarmComputerLauncher(final Queue.BuildableItem bi) {
         this.bi = bi;
@@ -28,15 +31,20 @@ public class DockerSwarmComputerLauncher extends JNLPLauncher {
     }
 
     @Override
-    public void launch(final SlaveComputer computer, final TaskListener listener){
+    public void launch(final SlaveComputer computer, final TaskListener listener) {
         if (computer instanceof DockerSwarmComputer) {
-            launch((DockerSwarmComputer) computer, listener);
+            try {
+                launch((DockerSwarmComputer) computer, listener);
+            }
+            catch (IOException e) {
+                LOGGER.log(Level.WARNING, "Failed to launch ", e.toString());
+            }
         } else {
             throw new IllegalArgumentException("This launcher only can handle DockerSwarmComputer");
         }
     }
 
-    private void launch(final DockerSwarmComputer computer, final TaskListener listener) {
+    private void launch(final DockerSwarmComputer computer, final TaskListener listener) throws IOException {
         final DockerSwarmCloud configuration = DockerSwarmCloud.get();
         final DockerSwarmAgentTemplate dockerSwarmAgentTemplate = configuration.getLabelConfiguration(this.label);
 
@@ -64,7 +72,8 @@ public class DockerSwarmComputerLauncher extends JNLPLauncher {
         }
     }
 
-    public void launchContainer(String[] commands, DockerSwarmCloud configuration, String[] envVars, DockerSwarmAgentTemplate dockerSwarmAgentTemplate, TaskListener listener, DockerSwarmComputer computer) {
+    public void launchContainer(String[] commands, DockerSwarmCloud configuration, String[] envVars,
+                                DockerSwarmAgentTemplate dockerSwarmAgentTemplate, TaskListener listener, DockerSwarmComputer computer) throws IOException {
         DockerSwarmPlugin swarmPlugin = Jenkins.getInstance().getPlugin(DockerSwarmPlugin.class);
         ServiceSpec crReq = createCreateServiceRequest(commands, configuration, envVars, dockerSwarmAgentTemplate, computer);
 
@@ -93,7 +102,8 @@ public class DockerSwarmComputerLauncher extends JNLPLauncher {
         crReq.TaskTemplate.setPlacementConstraints(dockerSwarmAgentTemplate.getPlacementConstraintsConfig());
     }
 
-    private ServiceSpec createCreateServiceRequest(String[] commands, DockerSwarmCloud configuration, String[] envVars, DockerSwarmAgentTemplate dockerSwarmAgentTemplate, DockerSwarmComputer computer) {
+    private ServiceSpec createCreateServiceRequest(String[] commands, DockerSwarmCloud configuration, String[] envVars,
+                                                   DockerSwarmAgentTemplate dockerSwarmAgentTemplate, DockerSwarmComputer computer) throws IOException {
         ServiceSpec crReq;
         if(dockerSwarmAgentTemplate.getLabel().contains("dind")){
             commands[2]= StringUtils.isEmpty(configuration.getSwarmNetwork())?

@@ -4,7 +4,11 @@ Launches a single use [docker agent serviceSpec](https://docs.docker.com/engine/
 
 This allows for serviceSpec options like Limits and Reservations to be set on agent containers.
 
+Forked from docker-swarm-plugin to support TLS by passing the client certificate from docker commons configuration.
+
 ### Configuration
+
+It is important that the 'Docker Host URI' does not contain a trailing slash (/).
 
 ![configuration](https://raw.githubusercontent.com/jenkinsci/docker-swarm-plugin/master/docs/images/configuration.png "Configuration")
 

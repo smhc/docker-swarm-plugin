@@ -62,7 +62,7 @@ public class DockerSwarmAgent extends AbstractCloudSlave implements EphemeralNod
         return labels;
     }
 
-    public void terminate() {
+    public void terminate() throws IOException {
         try {
             DockerSwarmPlugin swarmPlugin = Jenkins.getInstance().getPlugin(DockerSwarmPlugin.class);
             ActorRef agentLauncherRef = swarmPlugin.getActorSystem().actorFor("/user/" + getComputer().getName());

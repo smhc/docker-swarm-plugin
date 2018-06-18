@@ -7,6 +7,7 @@ import hudson.model.Queue;
 import hudson.model.queue.QueueListener;
 import jenkins.model.Jenkins;
 
+import java.io.IOException;
 import java.util.List;
 
 @Extension
@@ -31,7 +32,10 @@ public class OneShotProvisionQueueListener extends QueueListener {
 
                 final Node node = Jenkins.getInstance().getNode(computerName);
                 Computer.threadPoolForRemoting.submit(() -> {
-                        ((DockerSwarmAgent)node).terminate();
+                    try {
+                        ((DockerSwarmAgent) node).terminate();
+                    }
+                    catch (IOException e) {}
                 });
             }
         }
