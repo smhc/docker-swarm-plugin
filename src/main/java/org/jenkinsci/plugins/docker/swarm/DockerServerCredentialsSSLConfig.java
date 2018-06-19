@@ -33,9 +33,8 @@ public class DockerServerCredentialsSSLConfig implements SSLConfig {
             final TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
             trustManagerFactory.init(trustStore);
 
-                    final SSLContext context = SSLContext.getInstance("TLS");
-            context.init(keyManagerFactory.getKeyManagers(),
-                            trustManagerFactory.getTrustManagers(), null);
+            final SSLContext context = SSLContext.getInstance("TLS");
+            context.init(keyManagerFactory.getKeyManagers(), trustManagerFactory.getTrustManagers(), null);
             return context;
         } catch (CertificateException | InvalidKeySpecException | IOException e) {
             throw new KeyStoreException("Can't build keystore from provided client key/certificate", e);

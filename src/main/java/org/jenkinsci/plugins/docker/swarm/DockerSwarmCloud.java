@@ -124,6 +124,9 @@ public class DockerSwarmCloud extends Cloud {
         @RequirePOST
         public FormValidation doValidateTestDockerApiConnection(
                 @QueryParameter("uri") String uri) throws IOException {
+            if (uri.endsWith("/")) {
+                return FormValidation.error("URI must not have trailing /");
+            }
             Object response = new PingRequest(uri).execute();
             if(response instanceof ApiException){
                 return FormValidation.error(((ApiException)response).getCause(),"Couldn't ping docker api: " + uri + "/_ping");

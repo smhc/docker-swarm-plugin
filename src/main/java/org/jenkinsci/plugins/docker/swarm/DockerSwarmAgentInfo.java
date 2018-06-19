@@ -16,7 +16,7 @@ public class DockerSwarmAgentInfo implements RunAction2 {
 
     @Override
     public String getIconFileName() {
-        return "/plugin/docker-swarm-plugin/images/24x24/docker.png";
+        return "/plugin/docker-swarm-tls/images/24x24/docker.png";
     }
 
     @Override

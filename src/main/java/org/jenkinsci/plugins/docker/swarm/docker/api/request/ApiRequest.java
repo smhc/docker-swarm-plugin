@@ -2,6 +2,7 @@ package org.jenkinsci.plugins.docker.swarm.docker.api.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import hudson.model.Api;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -31,6 +32,8 @@ public abstract class ApiRequest {
     @JsonIgnore
     private final String url;
     @JsonIgnore
+    private static String credentialsId;
+    @JsonIgnore
     private Class<?> responseClass;
     @JsonIgnore
     private ResponseType responseType;
@@ -46,11 +49,17 @@ public abstract class ApiRequest {
         this.responseType = responseType;
         this.method = method;
         this.url = dockerApiUrl+url;
-        if (DockerSwarmCloud.get().getDockerHost().getCredentialsId() != null) {
-            client = new OkHttpClient.Builder().sslSocketFactory(DockerSwarmCloud.get().getSSLContext().getSocketFactory()).build();
+        String dockerCredentialsId = null;
+        if (DockerSwarmCloud.get().getDockerHost() != null) {
+            dockerCredentialsId = DockerSwarmCloud.get().getDockerHost().getCredentialsId();
         }
-        else {
-            client = new OkHttpClient();
+        if (client == null || (dockerCredentialsId != null && !dockerCredentialsId.equals(ApiRequest.credentialsId))) {
+            if (dockerCredentialsId != null) {
+                client = new OkHttpClient.Builder().sslSocketFactory(DockerSwarmCloud.get().getSSLContext().getSocketFactory()).build();
+            } else {
+                client = new OkHttpClient();
+            }
+            ApiRequest.credentialsId = dockerCredentialsId;
         }
     }
     public ApiRequest(HttpMethod method, String url, Class<?> responseClass , ResponseType responseType) throws IOException  {

@@ -15,8 +15,8 @@ public class TaskTemplate {
        //for reading from api
     }
 
-    public TaskTemplate(String image, String[] cmd, String[] env) {
-        this.ContainerSpec = new ContainerSpec(image,cmd,env);
+    public TaskTemplate(String image, String[] cmd, String[] env, String dir, String user) {
+        this.ContainerSpec = new ContainerSpec(image,cmd,env,dir,user);
 
     }
 
