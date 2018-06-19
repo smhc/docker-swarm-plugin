@@ -5,12 +5,11 @@ Launches a single use [docker agent serviceSpec](https://docs.docker.com/engine/
 This allows for serviceSpec options like Limits and Reservations to be set on agent containers.
 
 Forked from docker-swarm-plugin to support TLS by passing the client certificate from docker commons configuration.
+Also supports secrets, configs, user and custom slave exec command.
 
 ### Configuration
 
-It is important that the 'Docker Host URI' does not contain a trailing slash (/).
-
-![configuration](https://raw.githubusercontent.com/jenkinsci/docker-swarm-plugin/master/docs/images/configuration.png "Configuration")
+![configuration](https://raw.githubusercontent.com/smhc/docker-swarm-plugin-tls/master/docs/images/configuration.png "Configuration")
 
 ### Swarm Scheduling
 
@@ -18,10 +17,10 @@ Plugin attempts to create an agent as soon as build enters the queue. Bypasses c
 
 ## caching
  Caching is done via [docker volume plugin](https://github.com/suryagaddipati/docker-cache-volume-plugin).
- Driver gets called to create an overlayfs cache volume  for each build and once build is done volume gets deleted. This cache volume is mounted into agent in the directory specified by `Cache Dir` configuration option in Agent Templates.  On delete if there are any new changes to cache they get copied into a new basedir and pointer to baseCache gets updated. You can optionally mount lower base cache dir onto a NFS storage appliance.  Checkout plugin documentation for more details.
+ Driver gets called to create an overlayfs cache volume for each build and once build is done volume gets deleted. This cache volume is mounted into agent in the directory specified by `Cache Dir` configuration option in Agent Templates.  On delete if there are any new changes to cache they get copied into a new basedir and pointer to baseCache gets updated. You can optionally mount lower base cache dir onto a NFS storage appliance.  Checkout plugin documentation for more details.
 
 ### Swarm Dashboard
 
 Follow the link on sidebar to view the status of your swarm. What is executing where, what builds are in queue for what resources ect
 
-![dashboard](https://raw.githubusercontent.com/jenkinsci/docker-swarm-plugin/master/docs/images/dashboard.png "Dashboard")
+![dashboard](https://raw.githubusercontent.com/smhc/docker-swarm-plugin-tls/master/docs/images/dashboard.png "Dashboard")
