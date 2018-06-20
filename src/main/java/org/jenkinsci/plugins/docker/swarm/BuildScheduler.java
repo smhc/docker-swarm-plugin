@@ -16,7 +16,7 @@ public class BuildScheduler {
     private static final Logger LOGGER = Logger.getLogger(BuildScheduler.class.getName());
     public static void scheduleBuild(final Queue.BuildableItem bi) {
         try (ACLContext _ = ACL.as(ACL.SYSTEM)) {
-            final DockerSwarmLabelAssignmentAction action = createLabelAssignmentAction();
+            final DockerSwarmLabelAssignmentAction action = createLabelAssignmentAction(bi.task.getDisplayName());
             DockerSwarmAgentInfo dockerSwarmAgentInfo = new DockerSwarmAgentInfo(true);
             dockerSwarmAgentInfo.setAgentLabel(action.getLabel().toString());
             bi.replaceAction(dockerSwarmAgentInfo);
@@ -34,13 +34,13 @@ public class BuildScheduler {
         }
     }
 
-    private static DockerSwarmLabelAssignmentAction createLabelAssignmentAction() {
+    private static DockerSwarmLabelAssignmentAction createLabelAssignmentAction(String taskName) {
         try {
             Thread.sleep(5, 10);
         } catch (final InterruptedException e) {
             LOGGER.log(Level.INFO,"couldn't add agent", e);
         }
 
-        return new DockerSwarmLabelAssignmentAction("agent-" + System.nanoTime());
+        return new DockerSwarmLabelAssignmentAction("agent-" + taskName + "-" + System.nanoTime());
     }
 }
