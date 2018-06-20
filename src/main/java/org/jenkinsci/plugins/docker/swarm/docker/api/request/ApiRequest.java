@@ -97,8 +97,12 @@ public abstract class ApiRequest {
         return responseType;
     }
 
-    private Request toOkHttpRequest() throws JsonProcessingException {
-        String jsonString = Jackson.toJson(getEntity());
+    public String toJsonString() {
+        return Jackson.toJson(getEntity());
+    }
+
+    private Request toOkHttpRequest() {
+        String jsonString = toJsonString();
         LOGGER.log(Level.FINE,"JSON Request: {0}, {1}", new Object[]{getUrl(), jsonString});
         RequestBody body = RequestBody.create(JSON, jsonString);
         String method = getMethod().name();
@@ -114,10 +118,10 @@ public abstract class ApiRequest {
             Response response = client.newCall(apiCall).execute();
             return response.isSuccessful()? handleSuccess(response): handleFailure(response);
         } catch (JsonProcessingException e) {
-            LOGGER.log(Level.WARNING,"Serialisation exception: {0}", e.toString());
+            LOGGER.log(Level.WARNING,"Serialisation exception", e);
             return new SerializationException(e);
         } catch (IOException e) {
-            LOGGER.log(Level.WARNING,"Execute IO exception: {0}", e.toString());
+            LOGGER.log(Level.WARNING,"Execute IO exception", e);
             return new ApiException(responseClass,e);
         }
     }
@@ -135,7 +139,7 @@ public abstract class ApiRequest {
     private Object handleFailure(Response response) throws IOException {
         Object result;
         if(response.code() == 500 ) {
-            LOGGER.log(Level.WARNING,"API Request response status 500");
+            LOGGER.log(Level.WARNING,"API Request response status 500. Message: {0}", response.message());
             result = new ApiError(getClass(), response.code(), response.message()) ;
         }else{
             String responseBody = response.body().string();

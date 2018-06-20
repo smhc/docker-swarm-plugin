@@ -28,6 +28,7 @@ public class DockerSwarmComputerLauncher extends JNLPLauncher {
     private final String label;
     private final String jobName;
     private final Queue.BuildableItem bi;
+    private DockerSwarmAgentInfo agentInfo;
 
     private static final Logger LOGGER = Logger.getLogger(DockerSwarmComputerLauncher.class.getName());
 
@@ -44,7 +45,7 @@ public class DockerSwarmComputerLauncher extends JNLPLauncher {
                 launch((DockerSwarmComputer) computer, listener);
             }
             catch (IOException e) {
-                LOGGER.log(Level.WARNING, "Failed to launch: {0}", e.toString());
+                LOGGER.log(Level.WARNING, "Failed to launch", e);
             }
         } else {
             throw new IllegalArgumentException("This launcher only can handle DockerSwarmComputer");
@@ -54,6 +55,12 @@ public class DockerSwarmComputerLauncher extends JNLPLauncher {
     private void launch(final DockerSwarmComputer computer, final TaskListener listener) throws IOException {
         final DockerSwarmCloud configuration = DockerSwarmCloud.get();
         final DockerSwarmAgentTemplate dockerSwarmAgentTemplate = configuration.getLabelConfiguration(this.label);
+
+        this.agentInfo = this.bi.getAction(DockerSwarmAgentInfo.class);
+        this.agentInfo.setDockerImage(dockerSwarmAgentTemplate.getImage());
+        this.agentInfo.setLimitsNanoCPUs(dockerSwarmAgentTemplate.getLimitsNanoCPUs());
+        this.agentInfo.setReservationsMemoryBytes(dockerSwarmAgentTemplate.getReservationsMemoryBytes());
+        this.agentInfo.setReservationsNanoCPUs(dockerSwarmAgentTemplate.getReservationsNanoCPUs());
 
         setBaseWorkspaceLocation(dockerSwarmAgentTemplate);
 
@@ -95,12 +102,14 @@ public class DockerSwarmComputerLauncher extends JNLPLauncher {
         setLabels(crReq);
         setRestartAttemptCount(crReq);
 
+        this.agentInfo.setServiceRequestJson(crReq.toJsonString());
+
         final ActorRef agentLauncher = swarmPlugin.getActorSystem().actorOf(DockerSwarmAgentLauncherActor.props(listener.getLogger()), computer.getName());
         agentLauncher.tell(crReq,ActorRef.noSender());
     }
 
     private void setRestartAttemptCount(ServiceSpec crReq) {
-        crReq.TaskTemplate.setRestartAttemptCount(500);
+        crReq.TaskTemplate.setRestartAttemptCount(3);
     }
 
     private void setLabels(ServiceSpec crReq) {
@@ -178,7 +187,7 @@ public class DockerSwarmComputerLauncher extends JNLPLauncher {
             }
         }
         catch (IOException e) {
-            LOGGER.log(Level.WARNING, "Failed setting secret: {0}", e.toString());
+            LOGGER.log(Level.WARNING, "Failed setting secret", e);
         }
     }
 
@@ -203,7 +212,7 @@ public class DockerSwarmComputerLauncher extends JNLPLauncher {
             }
         }
         catch (IOException e) {
-            LOGGER.log(Level.WARNING, "Failed setting config: {0}", e.toString());
+            LOGGER.log(Level.WARNING, "Failed setting config", e);
         }
     }
 

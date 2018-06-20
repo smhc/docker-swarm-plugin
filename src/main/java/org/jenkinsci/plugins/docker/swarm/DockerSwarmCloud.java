@@ -123,7 +123,8 @@ public class DockerSwarmCloud extends Cloud {
 
         @RequirePOST
         public FormValidation doValidateTestDockerApiConnection(
-                @QueryParameter("uri") String uri) throws IOException {
+                @QueryParameter("uri") String uri,
+                @QueryParameter("credentialsId") String credentialsId) throws IOException {
             if (uri.endsWith("/")) {
                 return FormValidation.error("URI must not have trailing /");
             }
