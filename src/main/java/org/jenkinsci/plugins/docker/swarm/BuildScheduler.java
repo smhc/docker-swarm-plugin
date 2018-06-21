@@ -40,7 +40,13 @@ public class BuildScheduler {
         } catch (final InterruptedException e) {
             LOGGER.log(Level.INFO,"couldn't add agent", e);
         }
-
+        taskName = taskName.replaceAll("/", "_")
+                .replaceAll("-", "_")
+                .replaceAll(" ", "_")
+                .replaceAll(",", "_")
+                .replaceAll(" ", "_")
+                .replaceAll("=", "_")
+                .replaceAll("\\.", "_");
         return new DockerSwarmLabelAssignmentAction("agent-" + taskName + "-" + System.nanoTime());
     }
 }

@@ -91,6 +91,7 @@ public class DockerSwarmAgentLauncherActor extends AbstractActor {
 
     private void createServiceSuccess(CreateServiceResponse createServiceResponse) throws IOException {
         logger.println(String.format( "[%s] ServiceSpec created with ID : %s" , DateFormat.getTimeInstance().format(new Date()),  createServiceResponse.ID));
+        logger.println(String.format( "[%s] ServiceSpec request JSON : %s" ,  DateFormat.getTimeInstance().format(new Date()), this.createRequest.toJsonString()));
         if(StringUtils.isNotEmpty(createServiceResponse.Warning)){
             logger.println("ServiceSpec creation warning : " + createServiceResponse.Warning);
         }

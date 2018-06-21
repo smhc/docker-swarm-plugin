@@ -109,7 +109,7 @@ public class DockerSwarmComputerLauncher extends JNLPLauncher {
     }
 
     private void setRestartAttemptCount(ServiceSpec crReq) {
-        crReq.TaskTemplate.setRestartAttemptCount(3);
+        crReq.TaskTemplate.setRestartAttemptCount(0);
     }
 
     private void setLabels(ServiceSpec crReq) {
