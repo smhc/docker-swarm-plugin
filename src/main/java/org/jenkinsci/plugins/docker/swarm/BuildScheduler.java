@@ -41,6 +41,12 @@ public class BuildScheduler {
             LOGGER.log(Level.INFO,"couldn't add agent", e);
         }
         taskName = taskName.replaceAll("[^a-zA-Z0-9]", "_");
-        return new DockerSwarmLabelAssignmentAction("agent-" + taskName + "-" + System.nanoTime());
+        if (taskName.length() > 15) {
+            taskName = taskName.substring(taskName.length() - 15);
+        }
+        String truncatedTime = Long.toString(System.nanoTime());
+        truncatedTime = truncatedTime.substring(truncatedTime.length() - 5);
+        
+        return new DockerSwarmLabelAssignmentAction("agent-" + taskName + "-" + truncatedTime);
     }
 }
